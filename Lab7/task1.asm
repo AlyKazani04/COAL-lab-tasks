@@ -1,47 +1,34 @@
 INCLUDE Irvine32.inc
 
 .data
-	on BYTE "Bit 0 is ON", 0
-	off BYTE "Bit 0 is OFF", 0
-	val1 db 01010101b
-	val2 db 10101010b
-	val3 db 10110111b
+	msg_on BYTE "Bit 0 is ON", 0
+	msg_off BYTE "Bit 0 is OFF", 0
 
 .code
 main PROC
-	movzx eax, val1
-	movzx ebx, val2
-	movzx edx, val3
-
-	; clear odd bits
-	AND al, 01010101b
-
-	; set even bits
-	OR bl, 01010101b
+	mov al, 20h		; 0010 0000 b
+	mov bl, 3Dh		; 0011 1101 b
+	mov cl, 88h		; 1000 1000 b
 	
-	; toggle all bits
-	XOR dl, 11111111b
+	and al, 01010101b	; clear odd bits
+	or al, 10101010b	; set even bits
+	xor al, 11111111b	; toggle all bits
 
-	test al, 00000001b
-	jz BITOFF
-	jnz BITON
-COMPARED:
-	test bl, 00000001b
-	mov bl, dl
-	jz BITOFF
-	jnz BITON
-	jmp ENDPROG
-BITON:	
-	mov eax, OFFSET on
+	test al, 1		; test bit 0
+	jnz bit_on		; jump to bit_on, if bit 0 is on
+	jmp bit_off		; jump to bit_off, if bit 0 is off
+
+bit_on: 
+	mov edx, OFFSET msg_on
 	call writestring
-	call crlf
-	jmp COMPARED
-BITOFF:
-	mov eax, OFFSET off
+	jmp done
+
+bit_off:
+	mov edx, OFFSET msg_off
 	call writestring
+
+done: 
 	call crlf
-	jmp COMPARED
-ENDPROG: 
 	exit
 main ENDP
 END main
